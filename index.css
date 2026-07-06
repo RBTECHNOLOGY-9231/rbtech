@@ -61,7 +61,7 @@ input[type=number] {
   }
 body {
     background-color: var(--bg-primary);
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-family: var(--font-body);
     margin: 0;
     overflow-x: hidden;
