@@ -102,7 +102,7 @@ body.menu-open .nav-logo-text{opacity:0;pointer-events:none;transition:opacity 0
 .contact-info-card{background:var(--bg-surface);border:1px solid rgba(255,255,255,.05);border-radius:24px;padding:40px;margin-bottom:20px}
 .business-card{padding:5px}
 .business-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.business-info-line{padding:0;border:none !important;display:flex;flex-direction:column;align-items:center;text-align:center}
+.business-info-line{padding:0;border:none !important;display:flex;align-items:center;justify-content:center;gap:10px;text-align:left}
 .contact-info-line{display:flex;align-items:flex-start;gap:20px;padding:20px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .contact-info-line:last-child{border-bottom:none}
 .contact-icon{font-size:1.8rem;color:var(--accent);flex-shrink:0;margin-top:2px}
