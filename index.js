@@ -6,8 +6,9 @@ $(window).on('load', function () {
     gsap.to('#header', 0, { display: 'flex', delay: 2 });
 });
 
-// ===== NAVIGATION OPEN/CLOSE =====
+// ===== MAIN INITIALIZATION =====
 $(function () {
+    // --- Navigation Open/Close ---
     $('.menubar').on('click', function () {
         $('body').addClass('menu-open');
         gsap.to('#navigation-content', { duration: 0.6, y: '0%', ease: 'expo.inOut' });
@@ -16,10 +17,8 @@ $(function () {
         $('body').removeClass('menu-open');
         gsap.to('#navigation-content', { duration: 0.6, y: '-100%', ease: 'expo.inOut' });
     });
-});
 
-// ===== ROTATING TEXT =====
-$(function () {
+    // --- Rotating Text ---
     var TxtRotate = function (el, toRotate, period) {
         this.toRotate = toRotate;
         this.el = el;
@@ -51,35 +50,38 @@ $(function () {
         }
         setTimeout(function () { that.tick(); }, delta);
     };
-    window.onload = function () {
-        var elements = document.getElementsByClassName('txt-rotate');
-        for (var i = 0; i < elements.length; i++) {
-            var toRotate = elements[i].getAttribute('data-rotate');
-            var period = elements[i].getAttribute('data-period');
-            if (toRotate) {
-                new TxtRotate(elements[i], JSON.parse(toRotate), period);
-            }
-        }
-    };
-});
 
-// ===== PAGE NAVIGATION (with breaker transition) =====
-$(function () {
+    var elements = document.getElementsByClassName('txt-rotate');
+    for (var i = 0; i < elements.length; i++) {
+        var toRotate = elements[i].getAttribute('data-rotate');
+        var period = elements[i].getAttribute('data-period');
+        if (toRotate) {
+            new TxtRotate(elements[i], JSON.parse(toRotate), period);
+        }
+    }
+
+    // --- Page Navigation ---
     function navigateTo(showId) {
         gsap.to('#navigation-content', 0, { display: 'none', delay: 0.7 });
         gsap.to('#navigation-content', 0, { y: '-100%', delay: 0.7 });
-        gsap.to('#header, #about, #portfolio, #contact', 0, { display: 'none' });
+        
+        // Use jQuery for reliable display toggling
+        $('#header, #about, #portfolio, #contact, #gallery').hide();
+        
         gsap.to('#breaker', 0, { display: 'block' });
         gsap.to('#breaker-two', 0, { display: 'block', delay: 0.1 });
         gsap.to('#breaker', 0, { display: 'none', delay: 2 });
         gsap.to('#breaker-two', 0, { display: 'none', delay: 2 });
+        
         var displayType = (showId === '#header') ? 'flex' : 'block';
-        gsap.to(showId, 0, { display: displayType, delay: 0.7 });
+        setTimeout(function() {
+            $(showId).css('display', displayType);
+        }, 700);
         
         if (showId === '#header') {
             setTimeout(function() {
                 window.dispatchEvent(new Event('resize'));
-            }, 800);
+            }, 1500);
         }
 
         gsap.to('#navigation-content', 0, { display: 'flex', delay: 2 });
@@ -89,11 +91,10 @@ $(function () {
     $('#home-link').on('click', function (e) { e.preventDefault(); navigateTo('#header'); });
     $('#about-link').on('click', function (e) { e.preventDefault(); navigateTo('#about'); });
     $('#portfolio-link').on('click', function (e) { e.preventDefault(); navigateTo('#portfolio'); });
+    $('#gallery-link').on('click', function (e) { e.preventDefault(); navigateTo('#gallery'); });
     $('#contact-link').on('click', function (e) { e.preventDefault(); navigateTo('#contact'); });
-});
 
-// ===== CUSTOM CURSOR =====
-$(function () {
+    // --- Custom Cursor ---
     $(window).on('mousemove', function (e) {
         gsap.to('.cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
     });
@@ -101,36 +102,46 @@ $(function () {
         function () { gsap.to('.cursor', { width: 60, height: 60, backgroundColor: 'white', opacity: 1 }); },
         function () { gsap.to('.cursor', { width: 20, height: 20, backgroundColor: 'transparent', opacity: 1 }); }
     );
-});
 
-// ===== IMAGE CAROUSEL MODAL =====
-$(function () {
-    var currentSlide = 0;
-    var allImages = [];
+    // --- Image Carousel Modal ---
+    var carouselState = {
+        currentSlide: 0,
+        allImages: []
+    };
 
     function showSlide(index) {
-        if (allImages.length === 0) return;
-        if (index < 0) index = allImages.length - 1;
-        if (index >= allImages.length) index = 0;
-        currentSlide = index;
-        $('#carouselImage').attr('src', allImages[index]);
-        $('#carouselCurrent').text(index + 1);
-        $('#carouselTotal').text(allImages.length);
+        if (carouselState.allImages.length === 0) return;
+        
+        var idx = parseInt(index, 10);
+        if (isNaN(idx)) return;
+
+        if (idx < 0) idx = carouselState.allImages.length - 1;
+        if (idx >= carouselState.allImages.length) idx = 0;
+        
+        carouselState.currentSlide = idx;
+        $('#carouselImage').attr('src', carouselState.allImages[idx]);
+        $('#carouselCurrent').text(idx + 1);
+        $('#carouselTotal').text(carouselState.allImages.length);
     }
 
     $('.view-btn').on('click', function (e) {
         e.stopPropagation();
         var imagesStr = $(this).closest('.portfolio-item').attr('data-images');
-        allImages = imagesStr.split(',');
-        $('#carouselModal').addClass('active');
-        showSlide(0);
+        if (imagesStr) {
+            carouselState.allImages = imagesStr.split(',');
+            $('#carouselModal').addClass('active');
+            showSlide(0);
+        }
     });
 
-    $('.portfolio-item').on('click', function () {
+    $('.portfolio-item').on('click', function (e) {
+        e.stopPropagation();
         var imagesStr = $(this).attr('data-images');
-        allImages = imagesStr.split(',');
-        $('#carouselModal').addClass('active');
-        showSlide(0);
+        if (imagesStr) {
+            carouselState.allImages = imagesStr.split(',');
+            $('#carouselModal').addClass('active');
+            showSlide(0);
+        }
     });
 
     $('#modalClose').on('click', function () {
@@ -138,11 +149,11 @@ $(function () {
     });
 
     $('#carouselPrev').on('click', function () {
-        showSlide(currentSlide - 1);
+        showSlide(carouselState.currentSlide - 1);
     });
 
     $('#carouselNext').on('click', function () {
-        showSlide(currentSlide + 1);
+        showSlide(carouselState.currentSlide + 1);
     });
 
     $('.modal-overlay').on('click', function (e) {
@@ -154,7 +165,67 @@ $(function () {
     $(document).on('keydown', function (e) {
         if (!$('#carouselModal').hasClass('active')) return;
         if (e.keyCode === 27) { $('#carouselModal').removeClass('active'); }
-        if (e.keyCode === 37) { showSlide(currentSlide - 1); }
-        if (e.keyCode === 39) { showSlide(currentSlide + 1); }
+        if (e.keyCode === 37) { showSlide(carouselState.currentSlide - 1); }
+        if (e.keyCode === 39) { showSlide(carouselState.currentSlide + 1); }
     });
+
+    // --- Gallery Logic ---
+    var galleryImages = [
+        'gallery/project-1.jpg', 'gallery/project-2.png', 'gallery/project-3.jpg',
+        'gallery/project-4.png', 'gallery/project-5.png', 'gallery/project-6.png',
+        'gallery/project-7.png', 'gallery/project-8.jpg', 'gallery/project-9.png'
+    ];
+    var visibleCount = 6;
+
+    function renderGallery() {
+        var grid = $('#galleryGrid');
+        grid.empty();
+        for (let i = 0; i < Math.min(visibleCount, galleryImages.length); i++) {
+            var imgPath = galleryImages[i];
+            var item = $('<div class="gallery-item" data-index="' + i + '"><img src="' + imgPath + '"></div>');
+            item.on('click', function(e) {
+                e.stopPropagation();
+                
+                // 1. Get all current gallery items
+                var items = $('.gallery-item').get();
+                
+                // 2. Sort them by visual position (top then left)
+                items.sort(function(a, b) {
+                    var topA = a.offsetTop;
+                    var topB = b.offsetTop;
+                    if (topA !== topB) return topA - topB;
+                    return a.offsetLeft - b.offsetLeft;
+                });
+                
+                // 3. Create a new array of images in this visual order
+                var visualImages = [];
+                items.forEach(function(item) {
+                    var idx = $(item).data('index');
+                    visualImages.push(galleryImages[idx]);
+                });
+                
+                // 4. Find the index of the clicked image in the visual list
+                var visualIndex = items.indexOf(this);
+                
+                // 5. Update carousel state with the visually sorted list
+                carouselState.allImages = visualImages; 
+                $('#carouselModal').addClass('active');
+                showSlide(visualIndex);
+            });
+            grid.append(item);
+        }
+        if (visibleCount < galleryImages.length) {
+            $('#view-more-btn').show();
+        } else {
+            $('#view-more-btn').hide();
+        }
+    }
+
+    $('#view-more-btn').on('click', function() {
+        visibleCount += 6;
+        renderGallery();
+    });
+
+    renderGallery();
+
 });
