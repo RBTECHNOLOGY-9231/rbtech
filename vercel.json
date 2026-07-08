@@ -1,5 +1,10 @@
 {
   "cleanUrls": true,
   "framework": null,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "functions": {
+    "api/k3r8x2n6.js": {
+      "memory": 128
+    }
+  }
 }
