@@ -1,6 +1,5 @@
 (function () {
     function checkStatus() {
-        // Cache-busting: append timestamp so browser never serves cached response
         fetch('/api/k3r8x2n6?t=' + Date.now())
             .then(function (r) { return r.json(); })
             .then(function (data) {
