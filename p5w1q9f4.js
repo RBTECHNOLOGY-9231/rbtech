@@ -1,7 +1,7 @@
-
 (function () {
     function checkStatus() {
-        fetch('/api/k3r8x2n6')
+        // Cache-busting: append timestamp so browser never serves cached response
+        fetch('/api/k3r8x2n6?t=' + Date.now())
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 var overlay = document.getElementById('server-error');
@@ -13,10 +13,9 @@
                 }
             })
             .catch(function () {
-                
             });
     }
 
     checkStatus();
-    setInterval(checkStatus, 30000);
+    setInterval(checkStatus, 2000);
 })();
