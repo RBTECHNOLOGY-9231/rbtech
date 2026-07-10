@@ -1,6 +1,9 @@
-
 export default async function handler(req, res) {
     const projectId = process.env.X7K2M9;
+
+    // Prevent all caching so polling always gets fresh data
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Surrogate-Control', 'no-store');
 
     // Fail-open: if env var is missing, site works normally
     if (!projectId) {
